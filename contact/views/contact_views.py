@@ -1,13 +1,11 @@
-from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from contact.models import Contact
+from django.core.paginator import Paginator
 
 
 def index(request):
-    """
-    Render the index page for the contact app.
-    """
+
     contacts = Contact.objects \
         .filter(show=True)\
         .order_by('-id')
@@ -29,6 +27,7 @@ def index(request):
 
 
 def search(request):
+
     search_value = request.GET.get('q', '').strip()
 
     if search_value == '':
@@ -62,9 +61,7 @@ def search(request):
 
 
 def contact(request, contact_id):
-    """
-    Render the single contact page for the contact app.
-    """
+
     # single_contact = Contact.objects.get(pk=contact_id).first()
     single_contact = get_object_or_404(
         Contact, pk=contact_id, show=True
