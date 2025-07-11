@@ -1,45 +1,27 @@
 from django import forms
 from contact.models import Contact
 from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
+from . import models
 
 
 class ContactForm(forms.ModelForm):
-    first_name = forms.CharField(
-        widget=forms.TextInput(
+    picture = forms.ImageField(
+        widget=forms.FileInput(
             attrs={
-                'class': 'form-control',
-                'placeholder': 'Write your first name',
+                'accept': 'image/*'
             }
-        ),
-        label='1st Name',
-        help_text='Write the first name here',
+        )
     )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # self.fields['first_name'].widget.attrs.update({
-        #     'class': 'class-a class-b',
-        #     'placeholder': 'Write your first name',
-        # })
 
     class Meta:
         model = Contact
         fields = (
             'first_name', 'last_name', 'phone',
-            'email', 'description', 'category',
+            'email', 'description', 'category', 'picture'
         )
-
-        # widgets = {
-        #     'firt_name': forms.TextInput(
-        #         attrs={
-        #             'class': 'form-control',
-        #             'placeholder': 'Write your first name',
-
-        #         }
-        #     ),
-
-        # }
 
     def clean(self):
         cleaned_data = self.cleaned_data
@@ -69,3 +51,33 @@ class ContactForm(forms.ModelForm):
             )
 
         return first_name
+
+
+class RegisterForm(UserCreationForm):
+    first_name = forms.CharField(
+        required=True,
+        min_length=3,
+    )
+    last_name = forms.CharField(
+        required=True,
+        min_length=3,
+    )
+    email = forms.EmailField()
+
+    class Meta:
+        model = User
+        fields = (
+            'first_name', 'last_name', 'email',
+            'username', 'password1', 'password2',
+        )
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+
+        if User.objects.filter(email=email).exists():
+            self.add_error(
+                'email',
+                ValidationError('Email already exists!', code='invalid')
+            )
+
+        return email
