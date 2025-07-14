@@ -5,8 +5,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import password_validation
 
-from . import models
-
 
 class ContactForm(forms.ModelForm):
     picture = forms.ImageField(
@@ -14,7 +12,8 @@ class ContactForm(forms.ModelForm):
             attrs={
                 'accept': 'image/*'
             }
-        )
+        ),
+        required=False
     )
 
     class Meta:
